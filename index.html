@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>你好</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html, body {
+    height: 100%;
+  }
+
+  body {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+    background: #0b0a1e;
+    color: #fff;
+    font-family: "Songti SC", "Noto Serif SC", "STSong", "SimSun",
+                 "Source Han Serif SC", serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ========== 1. 圣域极光层 ========== */
+  .aurora {
+    position: fixed;
+    inset: -25%;
+    z-index: -2;
+    pointer-events: none;
+    background:
+      radial-gradient(40% 44% at 50% 10%, rgba(255, 240, 200, .40), transparent 66%),
+      radial-gradient(34% 38% at 15% 28%, rgba(170, 150, 255, .40), transparent 70%),
+      radial-gradient(32% 36% at 85% 24%, rgba(120, 210, 255, .36), transparent 70%),
+      radial-gradient(40% 44% at 72% 82%, rgba(255, 212, 142, .26), transparent 72%),
+      radial-gradient(36% 40% at 24% 84%, rgba(150, 255, 232, .18), transparent 72%),
+      linear-gradient(165deg, #0b0a1e 0%, #0d0b24 45%, #06101d 100%);
+    filter: blur(34px) saturate(120%);
+    animation: drift 30s ease-in-out infinite alternate;
+    will-change: transform;
+  }
+
+  .aurora::after {
+    content: "";
+    position: absolute;
+    inset: 12%;
+    background: conic-gradient(
+      from 0deg,
+      transparent 0deg,
+      rgba(255, 236, 190, .14) 55deg,
+      transparent 130deg,
+      rgba(190, 220, 255, .12) 215deg,
+      transparent 300deg
+    );
+    animation: spin 70s linear infinite;
+  }
+
+  /* ========== 2. 星点层 ========== */
+  .stars {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+      radial-gradient(1.5px 1.5px at 28px 42px,  rgba(255, 250, 230, .95), transparent),
+      radial-gradient(1px 1px     at 120px 180px, rgba(220, 230, 255, .85), transparent),
+      radial-gradient(2px 2px     at 210px 90px,  rgba(255, 246, 214, .70), transparent),
+      radial-gradient(1.2px 1.2px at 60px 220px,  rgba(235, 220, 255, .85), transparent),
+      radial-gradient(1px 1px     at 180px 20px,  rgba(200, 235, 255, .75), transparent),
+      radial-gradient(1.8px 1.8px at 240px 240px, rgba(255, 250, 235, .85), transparent),
+      radial-gradient(1px 1px     at 90px 120px,  rgba(255, 255, 255, .55), transparent),
+      radial-gradient(1.3px 1.3px at 150px 60px,  rgba(255, 244, 205, .75), transparent),
+      radial-gradient(1.1px 1.1px at 20px 160px,  rgba(255, 240, 220, .70), transparent),
+      radial-gradient(1.6px 1.6px at 260px 20px,  rgba(255, 252, 240, .80), transparent);
+    background-size: 280px 280px;
+    animation: twinkle 6s ease-in-out infinite alternate;
+  }
+
+  /* ========== 3. 细网格层 ========== */
+  .grid {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+      linear-gradient(to right,  rgba(255, 236, 190, .06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 236, 190, .06) 1px, transparent 1px);
+    background-size: 90px 90px;
+    -webkit-mask-image: radial-gradient(ellipse 72% 62% at 50% 44%, #000 18%, transparent 84%);
+            mask-image: radial-gradient(ellipse 72% 62% at 50% 44%, #000 18%, transparent 84%);
+  }
+
+  /* ========== 4. 天降光柱 ========== */
+  .beam {
+    position: fixed;
+    top: -12%;
+    left: 50%;
+    width: clamp(320px, 72vmin, 1000px);
+    height: 95vh;
+    transform: translateX(-50%);
+    z-index: -1;
+    pointer-events: none;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 244, 210, .30) 0%,
+      rgba(255, 238, 195, .12) 45%,
+      rgba(255, 240, 200, .04) 72%,
+      transparent 92%
+    );
+    filter: blur(30px);
+    clip-path: polygon(40% 0, 60% 0, 100% 100%, 0% 100%);
+    animation: beamBreathe 9s ease-in-out infinite alternate;
+  }
+
+  /* ========== 5. 上升光尘 ========== */
+  .motes {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .motes::before,
+  .motes::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: rgba(255, 247, 218, .95);
+    box-shadow:
+       8vw 96vh 0 0   rgba(255, 244, 200, .90),
+      18vw 88vh 0 1px rgba(255, 236, 180, .70),
+      31vw 99vh 0 0   rgba(255, 250, 225, .85),
+      44vw 91vh 0 0   rgba(255, 240, 190, .65),
+      57vw 97vh 0 1px rgba(255, 248, 210, .80),
+      68vw 86vh 0 0   rgba(255, 236, 180, .60),
+      79vw 94vh 0 0   rgba(255, 252, 235, .85),
+      91vw 90vh 0 1px rgba(255, 240, 190, .70),
+      12vw 78vh 0 0   rgba(255, 244, 200, .50),
+      36vw 83vh 0 1px rgba(255, 236, 180, .55),
+      62vw 80vh 0 0   rgba(255, 250, 225, .55),
+      86vw 76vh 0 0   rgba(255, 240, 190, .50);
+    filter: blur(.3px);
+    animation: floatUp 22s linear infinite;
+  }
+
+  .motes::after {
+    animation-duration: 34s;
+    animation-delay: -13s;
+    opacity: .75;
+    filter: blur(1px);
+    box-shadow:
+      14vw 92vh 0 0   rgba(255, 240, 200, .70),
+      27vw 84vh 0 1px rgba(255, 246, 215, .55),
+      39vw 95vh 0 0   rgba(255, 250, 235, .75),
+      52vw 87vh 0 0   rgba(255, 238, 190, .50),
+      64vw 98vh 0 1px rgba(255, 252, 228, .70),
+      74vw 82vh 0 0   rgba(255, 242, 195, .55),
+      84vw 93vh 0 0   rgba(255, 248, 220, .65),
+      95vw 85vh 0 1px rgba(255, 240, 200, .50),
+       5vw 80vh 0 0   rgba(255, 250, 230, .45),
+      49vw 79vh 0 1px rgba(255, 244, 205, .50);
+  }
+
+  /* ========== 标题区 ========== */
+  .title-wrap {
+    position: relative;
+    display: inline-block;
+    animation: levitate 9s ease-in-out infinite alternate;
+  }
+
+  /* 背后柔和金色圣光 */
+  .title-wrap::before {
+    content: "";
+    position: absolute;
+    inset: -40% -25%;
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(
+      closest-side,
+      rgba(255, 236, 170, .55),
+      rgba(255, 210, 130, .22) 52%,
+      transparent 76%
+    );
+    filter: blur(55px);
+    animation: haloPulse 8s ease-in-out infinite alternate;
+  }
+
+  /* 放射圣光 */
+  .rays {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 150vmax;
+    height: 150vmax;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+    pointer-events: none;
+    background: repeating-conic-gradient(
+      from 0deg,
+      rgba(255, 238, 190, .17) 0deg 1.1deg,
+      transparent 1.1deg 7.5deg
+    );
+    -webkit-mask-image: radial-gradient(circle, #000 0%, #000 12%, rgba(0,0,0,.55) 34%, transparent 60%);
+            mask-image: radial-gradient(circle, #000 0%, #000 12%, rgba(0,0,0,.55) 34%, transparent 60%);
+    animation: spin 90s linear infinite;
+  }
+
+  /* 头顶光环 */
+  .halo {
+    position: absolute;
+    left: 50%;
+    top: clamp(-58px, -7vw, -26px);
+    width: clamp(150px, 26vw, 400px);
+    height: clamp(42px, 7.5vw, 112px);
+    transform: translateX(-50%);
+    z-index: 2;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255, 232, 168, .60);
+    box-shadow:
+      0 0 26px rgba(255, 224, 150, .45),
+      0 0 70px rgba(255, 214, 130, .25),
+      inset 0 0 26px rgba(255, 226, 160, .22);
+    pointer-events: none;
+    animation: haloFloat 7s ease-in-out infinite alternate;
+  }
+
+  /* 超大标题 */
+  .title {
+    position: relative;
+    z-index: 1;
+    font-size: clamp(5.4rem, 25vw, 19rem);
+    font-weight: 700;
+    line-height: .96;
+    letter-spacing: .06em;
+    padding-left: .06em;               /* 抵消末字字距 */
+    background: linear-gradient(
+      176deg,
+      #ffffff 0%,
+      #fffaea 22%,
+      #ffe7ac 44%,
+      #ffd77e 56%,
+      #fff6dc 72%,
+      #ffffff 100%
+    );
+    background-size: 100% 220%;
+    -webkit-background-clip: text;
+            background-clip: text;
+    color: transparent;
+    filter:
+      drop-shadow(0 0 22px rgba(255, 226, 150, .60))
+      drop-shadow(0 0 65px rgba(255, 208, 120, .35))
+      drop-shadow(0 0 140px rgba(255, 240, 200, .22));
+    animation:
+      shimmer 10s ease-in-out infinite alternate,
+      rise 1.4s cubic-bezier(.2, .7, .2, 1) both;
+  }
+
+  /* 副标题 */
+  .subtitle {
+    position: relative;
+    margin-top: clamp(1.2rem, 3vh, 2.2rem);
+    font-size: clamp(.95rem, 2.3vw, 1.6rem);
+    font-weight: 400;
+    letter-spacing: .42em;
+    padding-left: .42em;
+    color: rgba(255, 248, 226, .82);
+    text-shadow:
+      0 0 16px rgba(255, 226, 160, .55),
+      0 0 45px rgba(255, 210, 130, .28);
+    animation: rise 1.4s cubic-bezier(.2, .7, .2, 1) .3s both;
+  }
+
+  /* 副标题上方神圣符号 */
+  .subtitle::before {
+    content: "✦";
+    display: block;
+    margin-bottom: .9rem;
+    font-size: .78em;
+    line-height: 1;
+    color: rgba(255, 236, 178, .90);
+    text-shadow: 0 0 18px rgba(255, 222, 140, .90);
+    animation: sigilGlow 4.5s ease-in-out infinite alternate;
+  }
+
+  /* 副标题下方金线 */
+  .subtitle::after {
+    content: "";
+    display: block;
+    width: clamp(90px, 16vw, 220px);
+    height: 1px;
+    margin: 1.5rem auto 0;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 232, 170, .15) 18%,
+      rgba(255, 240, 195, .85) 50%,
+      rgba(255, 232, 170, .15) 82%,
+      transparent
+    );
+    box-shadow: 0 0 14px rgba(255, 226, 160, .55);
+  }
+
+  /* ========== 动画 ========== */
+  @keyframes drift {
+    0%   { transform: translate3d(-3%, -2%, 0) scale(1.02) rotate(0deg); }
+    50%  { transform: translate3d( 3%,  3%, 0) scale(1.12) rotate(4deg); }
+    100% { transform: translate3d(-2%,  4%, 0) scale(1.05) rotate(-3deg); }
+  }
+
+  @keyframes spin {
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+  }
+
+  @keyframes twinkle {
+    0%   { opacity: .42; }
+    100% { opacity: .92; }
+  }
+
+  @keyframes beamBreathe {
+    0%   { opacity: .55; }
+    100% { opacity: 1; }
+  }
+
+  @keyframes floatUp {
+    0%   { transform: translateY(0);       opacity: 0; }
+    10%  { opacity: 1; }
+    85%  { opacity: .85; }
+    100% { transform: translateY(-115vh);  opacity: 0; }
+  }
+
+  @keyframes levitate {
+    0%   { transform: translateY(0); }
+    100% { transform: translateY(-10px); }
+  }
+
+  @keyframes haloPulse {
+    0%   { opacity: .62; transform: scale(.94); }
+    100% { opacity: 1;   transform: scale(1.08); }
+  }
+
+  @keyframes haloFloat {
+    0%   { transform: translateX(-50%) translateY(0);      opacity: .75; }
+    100% { transform: translateX(-50%) translateY(-14px);  opacity: 1; }
+  }
+
+  @keyframes shimmer {
+    0%   { background-position: 50%   0%; }
+    100% { background-position: 50% 100%; }
+  }
+
+  @keyframes sigilGlow {
+    0%   { opacity: .55; transform: scale(.94); }
+    100% { opacity: 1;   transform: scale(1.06); }
+  }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(28px) scale(.97); }
+    to   { opacity: 1; transform: translateY(0)   scale(1); }
+  }
+
+  /* ========== 无障碍：尊重减少动态效果偏好 ========== */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+    .title { background-position: 50% 50%; }
+    .rays  { opacity: .6; }
+  }
+</style>
+</head>
+<body>
+  <!-- 纯装饰图层，不参与内容与交互 -->
+  <div class="aurora" aria-hidden="true"></div>
+  <div class="stars" aria-hidden="true"></div>
+  <div class="grid" aria-hidden="true"></div>
+  <div class="beam" aria-hidden="true"></div>
+  <div class="motes" aria-hidden="true"></div>
+
+  <div class="title-wrap">
+    <div class="rays" aria-hidden="true"></div>
+    <div class="halo" aria-hidden="true"></div>
+    <h1 class="title">你好</h1>
+  </div>
+  <p class="subtitle">这里啥都没有</p>
+</body>
+</html>
